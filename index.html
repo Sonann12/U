@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធបោះឆ្នោតជ្រើសរើសប្រធានក្រុម Zero Trace</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #ffcc00;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #4dabf7;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-with-button input {
+            flex: 1;
+        }
+        
+        .input-with-button button {
+            width: auto;
+            padding: 12px 15px;
+            white-space: nowrap;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4dabf7;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+        
+        button {
+            background: linear-gradient(to right, #4dabf7, #3a7bd5);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #3a7bd5, #2c5f9e);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .candidates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .candidate {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .candidate:hover {
+            background: rgba(77, 171, 247, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .candidate.selected {
+            background: rgba(255, 204, 0, 0.3);
+            border: 2px solid #ffcc00;
+        }
+        
+        .candidate-number {
+            background: #4dabf7;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+        }
+        
+        .candidate-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .vote-count {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2rem;
+        }
+        
+        .vote-count span {
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.3);
+            border: 1px solid #2ecc71;
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
+        }
+        
+        .info {
+            background: rgba(241, 196, 15, 0.3);
+            border: 1px solid #f1c40f;
+        }
+        
+        .info-box {
+            background: rgba(255, 204, 0, 0.2);
+            border: 1px solid #ffcc00;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #4dabf7;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .admin-button {
+            background: linear-gradient(to right, #ffcc00, #ff9900);
+        }
+        
+        .check-button {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
+        @media (max-width: 600px) {
+            .candidates-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-with-button {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ប្រព័ន្ធបោះឆ្នោតជ្រើសរើសប្រធានក្រុម ZERO TRACE</h1>
+            <p class="subtitle">សូមវាយឈ្មោះ និងលេខសម្គាល់ដែលត្រឹមត្រូវមុនពេលបោះឆ្នោត</p>
+        </header>
+        
+        <div class="section">
+            <h2>ព័ត៌មានអ្នកបោះឆ្នោត</h2>
+            <div class="form-group">
+                <label for="voterName">ឈ្មោះអ្នកបោះឆ្នោត:</label>
+                <input type="text" id="voterName" placeholder="សូមបញ្ចូលឈ្មោះពេញ">
+            </div>
+            
+            <div class="form-group">
+                <label for="voterId">លេខសម្គាល់:</label>
+                <div class="input-with-button">
+                    <input type="text" id="voterId" placeholder="ZT-CO-2025-XXXXX">
+                    <button id="checkIdBtn" class="check-button">ឆែកលេខសម្គាល់</button>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <p>សម្គាល់៖ លេខសម្គាល់ត្រឹមត្រូវអាចបោះឆ្នោតបានច្រើនជាងម្ដង</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>ជ្រើសរើសបេក្ខជន</h2>
+            <div class="candidates-grid">
+                <div class="candidate" data-id="1">
+                    <div class="candidate-number">1</div>
+                    <div class="candidate-name">អ៊ូច សុណាន់</div>
+                </div>
+                <div class="candidate" data-id="2">
+                    <div class="candidate-number">2</div>
+                    <div class="candidate-name">សំ សុណា</div>
+                </div>
+                <div class="candidate" data-id="3">
+                    <div class="candidate-number">3</div>
+                    <div class="candidate-name">អូន យៀន</div>
+                </div>
+                <div class="candidate" data-id="4">
+                    <div class="candidate-number">4</div>
+                    <div class="candidate-name">មុំ វិឡា</div>
+                </div>
+                <div class="candidate" data-id="5">
+                    <div class="candidate-number">5</div>
+                    <div class="candidate-name">រិន ប៉ុនរ៉ុង</div>
+                </div>
+                <div class="candidate" data-id="6">
+                    <div class="candidate-number">6</div>
+                    <div class="candidate-name">ម៉ាន់ វាសនា</div>
+                </div>
+                <div class="candidate" data-id="7">
+                    <div class="candidate-number">7</div>
+                    <div class="candidate-name">មិន ចាន់សុផាន់</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="vote-count">
+            <p>អ្នកបានបោះឆ្នោតរួចហើយ: <span id="voteCount">0</span> ដង (អាចបោះបានជាអតិបរមា 2 ដង)</p>
+        </div>
+        
+        <button id="submitVote">បញ្ជូនសម្លេងឆ្នោត</button>
+        <button id="exportAllVotes" class="admin-button" style="display: none;">ផ្ញើសម្លេងទាំងអស់ទៅកាន់ Telegram</button>
+        
+        <div id="notification" class="notification"></div>
+        
+        <footer>
+            <p>ប្រព័ន្ធបោះឆ្នោតជ្រើសរើសប្រធានក្រុម ZERO TRACE | MLBB Team</p>
+            <p>សម្លេងឆ្នោតទាំងអស់នឹងត្រូវបានផ្ញើទៅកាន់ Telegram Bot</p>
+        </footer>
+    </div>
+
+    <script>
+        // Telegram Bot configuration
+        const telegramBotToken = '8458729155:AAGwe3mbhBiG5a5cUwZnUXbSNXps633U2UM';
+        const telegramChatId = '5430471921';
+        
+        // List of valid IDs
+        const validIds = [
+            "ZT-CO-2025-6H7P2A9B",
+            "ZT-CO-2025-5B8G4X9Y",
+            "ZT-CO-2025-2C6H1Z8P",
+            "ZT-CO-2025-7D9J3M5Q",
+            "ZT-CO-2025-3E4N6T7V",
+            "ZT-CO-2025-8F2L9W4X",
+            "ZT-CO-2025-1G5K8R3S",
+            "ZT-CO-2025-4J3M6C8D",
+            "ZT-CO-2025-K9P2R4W",
+            "ZT-CO-2025-X7B8M1Q"
+        ];
+        
+        // Unlimited vote ID
+        const unlimitedId = "ZT-CO-2025-6H7P2A9B";
+        
+        // Selected candidate
+        let selectedCandidate = null;
+        
+        // DOM elements
+        const voterNameInput = document.getElementById('voterName');
+        const voterIdInput = document.getElementById('voterId');
+        const submitButton = document.getElementById('submitVote');
+        const exportButton = document.getElementById('exportAllVotes');
+        const notificationDiv = document.getElementById('notification');
+        const voteCountSpan = document.getElementById('voteCount');
+        const checkIdBtn = document.getElementById('checkIdBtn');
+        
+        // Initialize vote count
+        updateVoteCount();
+        
+        // Candidate selection
+        document.querySelectorAll('.candidate').forEach(candidate => {
+            candidate.addEventListener('click', () => {
+                document.querySelectorAll('.candidate').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                candidate.classList.add('selected');
+                selectedCandidate = candidate.getAttribute('data-id');
+            });
+        });
+        
+        // Check ID button
+        checkIdBtn.addEventListener('click', () => {
+            const voterId = voterIdInput.value.trim();
+            
+            if (!voterId) {
+                showNotification("សូមបញ្ចូលលេខសម្គាល់មុនពេលឆែក!", "error");
+                return;
+            }
+            
+            if (validIds.includes(voterId)) {
+                showNotification("លេខសម្គាល់ត្រឹមត្រូវ! អ្នកអាចបោះឆ្នោតបាន។", "success");
+            } else {
+                showNotification("លេខសម្គាល់មិនត្រឹមត្រូវទេ! សូមព្យាយាមម្តងទៀត។", "error");
+            }
+            
+            updateVoteCount();
+        });
+        
+        // Submit vote
+        submitButton.addEventListener('click', () => {
+            const voterName = voterNameInput.value.trim();
+            const voterId = voterIdInput.value.trim();
+            
+            notificationDiv.style.display = 'none';
+            
+            // Validate inputs
+            if (!voterName) {
+                showNotification("សូមបញ្ចូលឈ្មោះអ្នកបោះឆ្នោត!", "error");
+                return;
+            }
+            
+            if (!voterId) {
+                showNotification("សូមបញ្ចូលលេខសម្គាល់!", "error");
+                return;
+            }
+            
+            if (!validIds.includes(voterId)) {
+                showNotification("លេខសម្គាល់មិនត្រឹមត្រូវទេ!", "error");
+                return;
+            }
+            
+            if (!selectedCandidate) {
+                showNotification("សូមជ្រើសរើសបេក្ខជនមួយរូប!", "error");
+                return;
+            }
+            
+            // Check vote count
+            const voteCount = getVoteCount(voterId);
+            const maxVotes = (voterId === unlimitedId) ? Infinity : 2;
+            
+            if (voteCount >= maxVotes) {
+                showNotification("លោកអ្នកបានបោះឆ្នោតច្រើនជាងដងដែលអនុញ្ញាតហើយ!", "error");
+                return;
+            }
+            
+            // Record vote
+            recordVote(voterId);
+            
+            // Send to Telegram
+            sendToTelegram(voterName, voterId, selectedCandidate)
+                .then(() => {
+                    showNotification("សម្លេងឆ្នោតរបស់លោកអ្នកត្រូវបានគេចាត់ទុក! សូមអរគុណ!", "success");
+                })
+                .catch(error => {
+                    console.error('Failed to send vote to Telegram:', error);
+                    showNotification("កំហុសក្នុងការផ្ញើសម្លេង! សូមព្យាយាមម្តងទៀត។", "error");
+                });
+            
+            // Reset form
+            resetForm();
+            updateVoteCount();
+        });
+        
+        // Update vote count display
+        function updateVoteCount() {
+            const voterId = voterIdInput.value.trim();
+            if (voterId && validIds.includes(voterId)) {
+                const count = getVoteCount(voterId);
+                voteCountSpan.textContent = count;
+                
+                if (voterId === unlimitedId) {
+                    document.querySelector('.vote-count p').innerHTML = 
+                        "លេខសម្គាល់ពិសេស - <span style='color:#ffcc00'>អាចបោះឆ្នោតគ្មានដែនកំណត់</span>";
+                }
+            } else {
+                voteCountSpan.textContent = '0';
+                document.querySelector('.vote-count p').innerHTML = 
+                    "អ្នកបានបោះឆ្នោតរួចហើយ: <span id='voteCount'>0</span> ដង (អាចបោះបានជាអតិបរមា 2 ដង)";
+            }
+        }
+        
+        // Show/hide admin button
+        voterIdInput.addEventListener('input', function() {
+            if (voterIdInput.value.trim() === unlimitedId) {
+                exportButton.style.display = 'block';
+            } else {
+                exportButton.style.display = 'none';
+            }
+            updateVoteCount();
+        });
+        
+        // Get vote count from localStorage
+        function getVoteCount(voterId) {
+            const votes = JSON.parse(localStorage.getItem('votes') || '{}');
+            return votes[voterId] || 0;
+        }
+        
+        // Record a vote
+        function recordVote(voterId) {
+            const votes = JSON.parse(localStorage.getItem('votes') || '{}');
+            
+            if (voterId !== unlimitedId) {
+                votes[voterId] = (votes[voterId] || 0) + 1;
+            }
+            
+            localStorage.setItem('votes', JSON.stringify(votes));
+        }
+        
+        // Reset form
+        function resetForm() {
+            voterNameInput.value = '';
+            voterIdInput.value = '';
+            selectedCandidate = null;
+            document.querySelectorAll('.candidate').forEach(c => {
+                c.classList.remove('selected');
+            });
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notificationDiv.textContent = message;
+            notificationDiv.className = `notification ${type}`;
+            notificationDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                notificationDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Send data to Telegram
+        function sendToTelegram(name, id, candidate) {
+            const candidateNames = {
+                '1': 'អ៊ូច សុណាន់',
+                '2': 'សំ សុណា',
+                '3': 'អូន យៀន',
+                '4': 'មុំ វិឡា',
+                '5': 'រិន ប៉ុនរ៉ុង',
+                '6': 'ម៉ាន់ វាសនា',
+                '7': 'មិន ចាន់សុផាន់'
+            };
+            
+            const message = `🗳️ សម្លេងឆ្នោតថ្មី៖
+👤 ឈ្មោះ: ${name}
+🆔 លេខសម្គាល់: ${id}
+⭐ បេក្ខជន: ${candidateNames[candidate]}`;
+            
+            const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+            
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: telegramChatId,
+                    text: message
+                })
+            })
+            .then(response => response.json());
+        }
+        
+        // Export all votes to Telegram
+        exportButton.addEventListener('click', async function() {
+            const button = this;
+            const originalText = button.textContent;
+            
+            button.disabled = true;
+            button.textContent = 'កំពុងផ្ញើ...';
+            
+            try {
+                const votes = JSON.parse(localStorage.getItem('votes') || '{}');
+                let message = "📊 សម្លេងឆ្នោតសរុប\n\n";
+                
+                // Build message with all votes
+                for (const [voterId, count] of Object.entries(votes)) {
+                    message += `🆔 ${voterId}: ${count} សម្លេង\n`;
+                }
+                
+                // Send to Telegram
+                await fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: telegramChatId,
+                        text: message
+                    })
+                });
+                
+                showNotification("សម្លេងឆ្នោតទាំងអស់ត្រូវបានផ្ញើដោយជោគជ័យ!", "success");
+            } catch (error) {
+                console.error('Export error:', error);
+                showNotification("កំហុសក្នុងការផ្ញើសម្លេងទាំងអស់!", "error");
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        });
+        
+        // Clear form on page refresh/close
+        window.addEventListener('beforeunload', () => {
+            resetForm();
+        });
+    </script>
+</body>
+</html>
